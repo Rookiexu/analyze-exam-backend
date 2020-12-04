@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Canvas-Chart</title>
+    <script type="text/javascript" src="../js/jquery-3.1.1.js"></script>
+    <script type="text/javascript" src="../js/draw.js"></script>
+
+</head>
+<body>
+    <div>
+        <a href="http://127.0.0.1:8080/exams/student.html">查询单个同学分数排名情况</a>
+        <a href="http://127.0.0.1:8080/exams/students.html">查询全班分数排名情况</a>
+        <a href="http://127.0.0.1:8080/exam/exams.html">查询班级考试整体信息</a>
+        <a href="http://127.0.0.1:8080/exam/scorelist.html">查询班级考试整体信息</a>
+
+        <form >
+            student:<input type="text" id="studentId" name="studentId" /><br />
+            <input id="findScore" type="button" value="查询成绩" />
+            <input id="clear" type="button" value="清除" />
+        </form>
+    </div>
+
+    <table>
+        <tbody id="tbody1"></tbody>
+    </table>
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        $("#findScore").click(function(){
+            //按钮只可以被点击一次
+            let studentId = document.getElementById("studentId").value;
+            $.getJSON(
+                "/exams/student?sId="+studentId+"&rank=0",//服务器地址
+                function(result) {
+                    let index = result.index;
+                    creatTable(index)
+                }
+            );
+        });
+    });
+
+    $(document).ready(function(){
+        $("#clear").click(function(){
+            clear("myCanvas");
+            clear("myCanvas2");
+        });
+    });
+
+
+
+
+    function creatTable(data){
+        //这个函数的参数可以是从后台传过来的也可以是从其他任何地方传过来的
+        //这里我假设这个data是一个长度为5的字符串数组 我要把他放在表格的一行里面，分成五列
+        var tableData="<tr>"
+        //动态增加5个td,并且把data数组的五个值赋给每个td
+        for(var i=0;i<data.length;i++){
+            tableData+="<td>"+data[i]+"</td>"
+        }
+        tableData+="</tr>"
+        //现在tableData已经生成好了，把他赋值给上面的tbody
+        $("#tbody1").html(tableData)
+    }
+
+</script>
+</body>
+</html>

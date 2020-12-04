@@ -4,17 +4,21 @@
 <head>
     <meta charset="utf-8">
     <title>Canvas-Chart</title>
-    <script type="text/javascript" src="/js/jquery-3.1.1.js"></script>
-    <script type="text/javascript" src="/js/draw.js"></script>
+    <script type="text/javascript" src="../js/jquery-3.1.1.js"></script>
+    <script type="text/javascript" src="../js/draw.js"></script>
+
 </head>
 <body>
     <div>
+        <a href="http://127.0.0.1:8080/exams/student.html">查询单个同学分数排名情况</a>
+        <a href="http://127.0.0.1:8080/exams/students.html">查询全班分数排名情况</a>
+        <a href="http://127.0.0.1:8080/exam/exams.html">查询班级考试整体信息</a>
+        <a href="http://127.0.0.1:8080/exam/scorelist.html">查询班级考试整体信息</a>
         <form >
-            班级: <input type="text" id="classId" name="classId" /><br />
-            年级:<input type="text" id="grade" name="grade"  /><br />
-            考试:<input type="text" id="examId" name="examId" /><br />
+            student:<input type="text" id="studentId" name="studentId" /><br />
             <input id="findRank" type="button" value="查询排名" />
             <input id="findScore" type="button" value="查询成绩" />
+            <input id="clear" type="button" value="清除" />
         </form>
     </div>
 
@@ -29,14 +33,9 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $("#findRank").click(function(){
-            //按钮只可以被点击一次
-            $(this).attr('disabled', 1);
-            //通过ajax请求springmvc
-            let classId = document.getElementById("classId").value;
-            let grade = document.getElementById("grade").value;
-            let examId = document.getElementById("examId").value;
+            let studentId = document.getElementById("studentId").value;
             $.getJSON(
-                "exam2?examId="+examId+"&grade="+grade+"&classId="+classId,//服务器地址
+                "student?sId="+studentId+"&rank=1",//服务器地址
                 function(result) {
                     let data = result
                     line(data,"myCanvas")
@@ -48,17 +47,21 @@
     $(document).ready(function(){
         $("#findScore").click(function(){
             //按钮只可以被点击一次
-            $(this).attr('disabled', 1);
-            let classId = document.getElementById("classId").value;
-            let grade = document.getElementById("grade").value;
-            let examId = document.getElementById("examId").value;
+            let studentId = document.getElementById("studentId").value;
             $.getJSON(
-                "exam2?examId="+examId+"&grade="+grade+"&classId="+classId,//服务器地址
+                "student?sId="+studentId+"&rank=0",//服务器地址
                 function(result) {
                     let data = result
                     line(data,"myCanvas2")
                 }
             );
+        });
+    });
+
+    $(document).ready(function(){
+        $("#clear").click(function(){
+            clear("myCanvas");
+            clear("myCanvas2");
         });
     });
 

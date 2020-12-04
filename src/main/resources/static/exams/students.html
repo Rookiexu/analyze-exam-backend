@@ -8,13 +8,17 @@
     <script type="text/javascript" src="/js/draw.js"></script>
 </head>
 <body>
+<a href="http://127.0.0.1:8080/exams/student.html">查询单个同学分数排名情况</a>
+<a href="http://127.0.0.1:8080/exams/students.html">查询全班分数排名情况</a>
+<a href="http://127.0.0.1:8080/exam/exams.html">查询班级考试整体信息</a>
+<a href="http://127.0.0.1:8080/exam/scorelist.html">查询班级考试整体信息</a>
     <div>
         <form >
-            班级: <input type="text" id="classId" name="classId" /><br />
-            年级:<input type="text" id="grade" name="grade"  /><br />
-            考试:<input type="text" id="examId" name="examId" /><br />
-            <input id="findRank" type="button" value="查询排名" />
+            classId:<input type="text" id="classId" name="classId" value="1"/><br />
+            grade:<input type="text" id="grade" name="grade" value="2017"/><br />
             <input id="findScore" type="button" value="查询成绩" />
+            <input id="findRank" type="button" value="查询排名" />
+            <input id="clear" type="button" value="清除" />
         </form>
     </div>
 
@@ -28,15 +32,11 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#findRank").click(function(){
-            //按钮只可以被点击一次
-            $(this).attr('disabled', 1);
-            //通过ajax请求springmvc
+        $("#findScore").click(function(){
             let classId = document.getElementById("classId").value;
             let grade = document.getElementById("grade").value;
-            let examId = document.getElementById("examId").value;
             $.getJSON(
-                "exam2?examId="+examId+"&grade="+grade+"&classId="+classId,//服务器地址
+                "students?rank=0&grade="+grade+"&classId="+classId,//服务器地址
                 function(result) {
                     let data = result
                     line(data,"myCanvas")
@@ -46,14 +46,11 @@
     });
 
     $(document).ready(function(){
-        $("#findScore").click(function(){
-            //按钮只可以被点击一次
-            $(this).attr('disabled', 1);
+        $("#findRank").click(function(){
             let classId = document.getElementById("classId").value;
             let grade = document.getElementById("grade").value;
-            let examId = document.getElementById("examId").value;
             $.getJSON(
-                "exam2?examId="+examId+"&grade="+grade+"&classId="+classId,//服务器地址
+                "students?rank=1&grade="+grade+"&classId="+classId,//服务器地址
                 function(result) {
                     let data = result
                     line(data,"myCanvas2")
@@ -62,6 +59,12 @@
         });
     });
 
+    $(document).ready(function(){
+        $("#clear").click(function(){
+            clear("myCanvas");
+            clear("myCanvas2");
+        });
+    });
 </script>
 </body>
 </html>
