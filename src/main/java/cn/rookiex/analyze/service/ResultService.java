@@ -7,8 +7,10 @@ import cn.rookiex.analyze.entity.Exam;
 import cn.rookiex.analyze.entity.ExamResult;
 import cn.rookiex.analyze.entity.Student;
 import cn.rookiex.analyze.message.LineResultData;
+import cn.rookiex.analyze.message.Message;
 import cn.rookiex.analyze.message.SeriesData;
 import cn.rookiex.analyze.message.TitleInfo;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -329,4 +331,11 @@ public class ResultService {
         examResults.getDatasets().addAll(lineDates);
         return examResults;
     }
+
+    public String getResult(Object object){
+        Message message = new Message();
+        message.setData(object);
+        return JSONObject.toJSONString(message);
+    }
+
 }
