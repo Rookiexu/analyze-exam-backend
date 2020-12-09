@@ -1,5 +1,6 @@
 package cn.rookiex.analyze.service;
 
+import cn.rookiex.analyze.message.LineResultData;
 import cn.rookiex.analyze.dao.ExamRepository;
 import cn.rookiex.analyze.dao.StudentRepository;
 import cn.rookiex.analyze.entity.Exam;
@@ -40,7 +41,7 @@ public class AnalyzeService {
         return examIds;
     }
 
-    public ExamResults getStudentAllExamResult(int sId, boolean isRank) {
+    public LineResultData getStudentAllExamResult(int sId, boolean isRank) {
         Optional<Student> studentOpt = studentRepository.findById(sId);
         if (studentOpt.isPresent()){
             Student student = studentOpt.get();
@@ -57,7 +58,7 @@ public class AnalyzeService {
         return resultService.respExamResultsFail("no student");
     }
 
-    public ExamResults getClassAllExamResult(int classId, int grade, boolean isRank) {
+    public LineResultData getClassAllExamResult(int classId, int grade, boolean isRank) {
         //全班学生
         List<Student> classStudents = studentRepository.findAllByClassIdAndGrade(classId, grade);
         //年级所有考试

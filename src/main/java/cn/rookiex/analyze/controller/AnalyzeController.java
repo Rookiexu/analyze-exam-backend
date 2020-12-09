@@ -1,8 +1,11 @@
 package cn.rookiex.analyze.controller;
 
 import cn.rookiex.analyze.bean.ExamResults;
+import cn.rookiex.analyze.message.LineResultData;
+import cn.rookiex.analyze.message.Message;
 import cn.rookiex.analyze.service.AnalyzeService;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @date 2020/12/3 18:17
  * @des
  */
+@Slf4j
 @Controller
 public class AnalyzeController {
 
@@ -23,15 +27,19 @@ public class AnalyzeController {
     @GetMapping(path = "/exams/student")
     @ResponseBody
     public String getStudentAllExam(@RequestParam int rank, @RequestParam int sId) {
-        ExamResults analyzeExam = analyzeService.getStudentAllExamResult(sId, rank == 1);
+        LineResultData analyzeExam = analyzeService.getStudentAllExamResult(sId, rank == 1);
         return JSONObject.toJSONString(analyzeExam);
     }
 
     @GetMapping(path = "/exams/students")
     @ResponseBody
     public String getStudentAllExam(@RequestParam int rank, @RequestParam int classId, @RequestParam int grade) {
-        ExamResults analyzeExam = analyzeService.getClassAllExamResult(classId, grade, rank == 1);
-        return JSONObject.toJSONString(analyzeExam);
+        LineResultData analyzeExam = analyzeService.getClassAllExamResult(classId, grade, rank == 1);
+        Message message = new Message();
+        message.setData(analyzeExam);
+        String s = JSONObject.toJSONString(message);
+        log.info(s);
+        return s;
     }
 
     @GetMapping(path = "/exam/class")

@@ -1,14 +1,17 @@
 package cn.rookiex.analyze.service;
 
 import cn.rookiex.analyze.anno.Name;
-import cn.rookiex.analyze.bean.ClassExamResult;
-import cn.rookiex.analyze.bean.ExamResults;
-import cn.rookiex.analyze.bean.lineData;
+import cn.rookiex.analyze.bean.*;
+import cn.rookiex.analyze.constants.TitleConstants;
 import cn.rookiex.analyze.entity.Exam;
 import cn.rookiex.analyze.entity.ExamResult;
 import cn.rookiex.analyze.entity.Student;
+import cn.rookiex.analyze.message.LineResultData;
+import cn.rookiex.analyze.message.SeriesData;
+import cn.rookiex.analyze.message.TitleInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.springframework.stereotype.Service;
 
 import java.lang.annotation.Annotation;
@@ -25,18 +28,18 @@ import java.util.Set;
 @Service
 public class ResultService {
 
-    private lineData buildLineData(Student student, Map<Integer, Exam> examIds,
-                                   Map<Integer, Map<Integer, ExamResult>> examIdPidResult, boolean isRank) {
+    private SeriesData buildLineData(Student student, Map<Integer, Exam> examIds,
+                                     Map<Integer, Map<Integer, ExamResult>> examIdPidResult, boolean isRank) {
         int i;
-        lineData lineData = new lineData();
+        SeriesData lineData = new SeriesData();
         lineData.setName(student.getName());
-        Object[] scores = new Object[examIds.size()];
+        Number[] scores = new Number[examIds.size()];
         i = 0;
         for (Integer examId : examIds.keySet()) {
             Map<Integer, ExamResult> examResults1 = examIdPidResult.get(examId);
             ExamResult examResult = examResults1.get(student.getSId());
             if (examResult.getAbsent() == 1) {
-                scores[i++] = -1;
+                scores[i++] = null;
             } else {
                 if (isRank) {
                     scores[i++] = examResult.getRank();
@@ -45,7 +48,7 @@ public class ResultService {
                 }
             }
         }
-        lineData.setScores(scores);
+        lineData.setScore(scores);
         return lineData;
     }
 
@@ -58,22 +61,89 @@ public class ResultService {
         return index;
     }
 
-    public ExamResults respGetClassAllExamResult(boolean isRank, List<Student> classStudents,
-                                                 Map<Integer, Exam> examIds, List<ExamResult> allExamResult) {
+    public LineResultData respGetClassAllExamResult(boolean isRank, List<Student> classStudents,
+                                                    Map<Integer, Exam> examIds, List<ExamResult> allExamResult) {
         //成绩按照考试分类排序
         Map<Integer, Map<Integer, ExamResult>> idResultMap = sortByIdAndScore(allExamResult);
 
-        ExamResults examResults = new ExamResults();
         String[] index = buildIndex(examIds);
-        examResults.setIndex(index);
-        examResults.setFromBig(isRank ? 0 : 1);
-        buildRankInfo(isRank, allExamResult, examResults);
+
+        LineResultData lineResultData = new LineResultData();
+        TitleInfo titleInfo = new TitleInfo();
+        titleInfo.setTitle(TitleConstants.STUDENT_RESULT_TITLE);
+        titleInfo.setYName(isRank ? TitleConstants.RANK_TITLE : TitleConstants.SCORE_TITLE);
+        titleInfo.setXAxis(index);
+        titleInfo.setYAxis(isRank ? getRankYAxis(allExamResult) : getScoreYAxis(allExamResult));
+        titleInfo.setLegend(getLegend(allExamResult,classStudents));
+        titleInfo.setInverse(isRank);
+        titleInfo.setMin(isRank ? 1 : 0);
+        lineResultData.setTitleInfo(titleInfo);
 
         for (Student student : classStudents) {
-            lineData lineData = buildLineData(student, examIds, idResultMap, isRank);
-            examResults.getDatasets().add(lineData);
+            SeriesData lineData = buildLineData(student, examIds, idResultMap, isRank);
+            lineResultData.getSeriesData().add(lineData);
         }
-        return examResults;
+        return lineResultData;
+    }
+
+    private String[] getLegend(List<ExamResult> allExamResult, List<Student> classStudents) {
+        Map<Integer,String> nameMap = Maps.newHashMap();
+        for (Student classStudent : classStudents) {
+            nameMap.put(classStudent.getSId(),classStudent.getName());
+        }
+        Set<String> name = Sets.newHashSet();
+        for (ExamResult examResult : allExamResult) {
+            String s = nameMap.get(examResult.getSId());
+            if (s == null) {
+                continue;
+            }
+            name.add(s);
+        }
+        return name.toArray(new String[0]);
+    }
+
+    private String[] getScoreYAxis(List<ExamResult> allExamResult) {
+        double minScore = 0;
+        double maxScore = 1;
+        for (ExamResult examResult : allExamResult) {
+            double score = examResult.getScore();
+            if (score > maxScore) {
+                maxScore = score;
+            }
+            if (score < minScore) {
+                minScore = score;
+            }
+        }
+        int step = (int) ((maxScore - minScore) / 10);
+        String[] strings = new String[11];
+
+        for (int i = 0; i <= 10; i++) {
+            strings[i] = String.valueOf(step * i);
+        }
+        return strings;
+    }
+
+    private String[] getRankYAxis(List<ExamResult> allExamResult) {
+        int minRank = 1;
+        int maxRank = 1;
+        for (ExamResult examResult : allExamResult) {
+            int rank = examResult.getRank();
+            if (rank > maxRank) {
+                maxRank = rank;
+            }
+            if (rank < minRank) {
+                minRank = rank;
+            }
+        }
+
+        int step = (maxRank - minRank) / 10;
+        String[] strings = new String[11];
+
+        for (int i = 0; i <= 10; i++) {
+            strings[10 - i] = String.valueOf(1 + step * i);
+        }
+
+        return strings;
     }
 
     private void buildRankInfo(boolean isRank, List<ExamResult> allExamResult, ExamResults examResults) {
@@ -147,12 +217,12 @@ public class ResultService {
         return examIdPidResultMap;
     }
 
-    public ExamResults respExamResultsFail(String errMsg) {
+    public LineResultData respExamResultsFail(String errMsg) {
         return null;
     }
 
     public ExamResults respGetClassAllExamHistory(Map<Integer, Exam> examMaps, List<ExamResult> allByExamIdInAndClassId) {
-        return respGetClassAllExamHistory(examMaps, allByExamIdInAndClassId,null);
+        return respGetClassAllExamHistory(examMaps, allByExamIdInAndClassId, null);
     }
 
     private List<lineData> buildLineDates(Map<Integer, Exam> examMaps, Map<Integer, ClassExamResult> classResultMap, Set<String> prams) {
@@ -161,10 +231,10 @@ public class ResultService {
         for (Field field : fields) {
             Annotation[] annotations = field.getAnnotations();
             for (Annotation annotation : annotations) {
-                if (annotation instanceof Name){
+                if (annotation instanceof Name) {
                     String name = ((Name) annotation).name();
-                    if (prams != null){
-                        if (!prams.contains(name)){
+                    if (prams != null) {
+                        if (!prams.contains(name)) {
                             continue;
                         }
                     }
@@ -244,10 +314,10 @@ public class ResultService {
 
     public ExamResults respGetClassAllExamHistory(Map<Integer, Exam> examMaps, List<ExamResult> allByExamIdInAndClassId, Set<String> prams) {
         Map<Integer, List<ExamResult>> idResultMap = getIdResultMap(allByExamIdInAndClassId);
-        Map<Integer,ClassExamResult> classResultMap = Maps.newTreeMap();
+        Map<Integer, ClassExamResult> classResultMap = Maps.newTreeMap();
         for (Integer examId : idResultMap.keySet()) {
             ClassExamResult classResult = buildClassResult(examId, idResultMap.get(examId));
-            classResultMap.put(examId,classResult);
+            classResultMap.put(examId, classResult);
         }
 
         ExamResults examResults = new ExamResults();
@@ -255,7 +325,7 @@ public class ResultService {
         examResults.setIndex(index);
         examResults.setFromBig(1);
 
-        List<lineData> lineDates = buildLineDates(examMaps,classResultMap,prams);
+        List<lineData> lineDates = buildLineDates(examMaps, classResultMap, prams);
         examResults.getDatasets().addAll(lineDates);
         return examResults;
     }

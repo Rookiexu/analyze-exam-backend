@@ -16,8 +16,11 @@
         <a href="http://127.0.0.1:8080/exam/scorelist.html">查询班级考试整体信息</a>
 
         <form >
-            student:<input type="text" id="studentId" name="studentId" /><br />
-            <input id="findScore" type="button" value="查询成绩" />
+            班级:<input type="text" id="classId" name="classId" /><br />
+            年级:<input type="text" id="grade" name="grade" value="2017"/><br />
+
+            <input id="findStudents" type="button" value="查询学生表" />
+            <input id="findExams" type="button" value="查询年级考试信息" />
             <input id="clear" type="button" value="清除" />
         </form>
     </div>
@@ -29,14 +32,30 @@
 <script type="text/javascript">
 
     $(document).ready(function(){
-        $("#findScore").click(function(){
+        $(this).attr('disabled', 1);
+        $("#findExams").click(function(){
             //按钮只可以被点击一次
-            let studentId = document.getElementById("studentId").value;
+            let classId = document.getElementById("classId").value;
+            let grade = document.getElementById("grade").value;
             $.getJSON(
-                "/exams/student?sId="+studentId+"&rank=0",//服务器地址
+                "/data/exams?classId="+classId+"&grade="+grade,//服务器地址
                 function(result) {
-                    let index = result.index;
-                    creatTable(index)
+                    creatTable(result)
+                }
+            );
+        });
+    });
+
+    $(document).ready(function(){
+        $(this).attr('disabled', 1);
+        $("#findStudents").click(function(){
+            //按钮只可以被点击一次
+            let classId = document.getElementById("classId").value;
+            let grade = document.getElementById("grade").value;
+            $.getJSON(
+                "/data/students?classId="+classId+"&grade="+grade,//服务器地址
+                function(result) {
+                    creatTable(result)
                 }
             );
         });
@@ -52,17 +71,19 @@
 
 
 
-    function creatTable(data){
-        //这个函数的参数可以是从后台传过来的也可以是从其他任何地方传过来的
-        //这里我假设这个data是一个长度为5的字符串数组 我要把他放在表格的一行里面，分成五列
-        var tableData="<tr>"
-        //动态增加5个td,并且把data数组的五个值赋给每个td
-        for(var i=0;i<data.length;i++){
-            tableData+="<td>"+data[i]+"</td>"
-        }
-        tableData+="</tr>"
-        //现在tableData已经生成好了，把他赋值给上面的tbody
-        $("#tbody1").html(tableData)
+    function creatTable(dates){
+        let tbody = document.querySelector('tbody');
+        for (let i = 0;i<dates.length;i++){
+            let tr = document.createElement('tr');
+          tbody.appendChild(tr);
+          for(let k in dates[i]){//里面的for循环 td
+              //创建单元格
+              let td = document.createElement('td');
+              //把对象里面的属性值，给td
+              td.innerHTML = dates[i][k];
+              tr.appendChild(td);
+          }
+      }
     }
 
 </script>

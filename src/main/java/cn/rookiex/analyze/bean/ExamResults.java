@@ -14,6 +14,7 @@ import java.util.Set;
 @Data
 public class ExamResults {
 
+
     /**
      * y最大值
      */
