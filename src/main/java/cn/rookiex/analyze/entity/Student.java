@@ -27,4 +27,6 @@ public class Student {
     private int classId;
 
     private String name;
+
+    private String title;
 }

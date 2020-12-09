@@ -26,6 +26,8 @@ public class Exam implements Comparable<Exam> {
 
     private int grade;
 
+    private String title;
+
     /**
      * Compares this object with the specified object for order.  Returns a
      * negative integer, zero, or a positive integer as this object is less
