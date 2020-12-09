@@ -1,14 +1,17 @@
 package cn.rookiex.analyze.message;
 
+import lombok.Data;
+
 /**
  * @author rookiex
  * @date 2020/12/8 16:23
  * @des
  */
+@Data
 public class Message {
     private int code = 20000;
 
-    private MessageObj data;
+    private Object data;
 
 
     public int getCode() {
@@ -19,11 +22,11 @@ public class Message {
         this.code = code;
     }
 
-    public MessageObj getData() {
+    public Object getData() {
         return data;
     }
 
-    public void setData(MessageObj data) {
+    public void setData(Object data) {
         this.data = data;
     }
 }

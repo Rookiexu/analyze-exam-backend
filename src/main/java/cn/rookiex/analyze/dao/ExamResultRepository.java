@@ -35,6 +35,9 @@ public interface ExamResultRepository extends JpaRepository<ExamResult, ExamResu
      */
     List<ExamResult> findAllByExamId(int examId);
 
+
+    List<ExamResult> findAllByExamIdIn(Collection<Integer> examIds);
+
     /**
      * @param examId 考试id
      * @param classIds  班级id
