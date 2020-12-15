@@ -2,6 +2,7 @@ package cn.rookiex.analyze.service;
 
 import cn.rookiex.analyze.anno.Name;
 import cn.rookiex.analyze.bean.*;
+import cn.rookiex.analyze.constants.MessageErrCode;
 import cn.rookiex.analyze.constants.TitleConstants;
 import cn.rookiex.analyze.entity.Exam;
 import cn.rookiex.analyze.entity.ExamResult;
@@ -335,6 +336,13 @@ public class ResultService {
     public String getResult(Object object){
         Message message = new Message();
         message.setData(object);
+        return JSONObject.toJSONString(message);
+    }
+
+    public String getErrResult(MessageErrCode messageErrCode,String errMsg){
+        Message message = new Message();
+        message.setMessage(errMsg);
+        message.setCode(messageErrCode.getErrCode());
         return JSONObject.toJSONString(message);
     }
 

@@ -13,6 +13,8 @@ public class Message {
 
     private Object data;
 
+    private String message;
+
 
     public int getCode() {
         return code;

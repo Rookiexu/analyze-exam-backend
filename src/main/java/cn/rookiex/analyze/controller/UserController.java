@@ -1,5 +1,6 @@
 package cn.rookiex.analyze.controller;
 
+import cn.rookiex.analyze.constants.MessageErrCode;
 import cn.rookiex.analyze.entity.User;
 import cn.rookiex.analyze.message.Message;
 import cn.rookiex.analyze.message.UserData;
@@ -33,20 +34,32 @@ public class UserController {
     @ResponseBody
     public String login(@RequestParam String userName, @RequestParam String password) {
         String token = userService.login(userName,password);
-        return resultService.getResult(token);
+        if (token == null){
+            return resultService.getErrResult(MessageErrCode.TOKEN_ERR,"获取信息err");
+        }else {
+            return resultService.getResult(token);
+        }
     }
 
     @GetMapping(path = "/user/getInfo")
     @ResponseBody
     public String getInfo(@RequestParam String token) {
         User user = userService.getInfo(token);
-        return resultService.getResult(new UserData(user));
+        if (user == null){
+            return resultService.getErrResult(MessageErrCode.TOKEN_ERR,"获取信息err");
+        }else {
+            return resultService.getResult(new UserData(user));
+        }
     }
 
     @PostMapping(path = "/user/logout")
     @ResponseBody
     public String logout(@RequestParam String token) {
-        userService.logout(token);
+        try {
+            userService.logout(token);
+        }catch (Exception e){
+            return resultService.getErrResult(MessageErrCode.TOKEN_ERR,"登出err");
+        }
         return resultService.getResult(null);
     }
 }
