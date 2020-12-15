@@ -18,7 +18,7 @@ public class UserData {
     /**
      * 角色
      */
-    private final String roles;
+    private final String[] roles;
 
     /**
      * 介绍
@@ -34,6 +34,7 @@ public class UserData {
         this.avatar = user.getAvatar();
         this.name = user.getName();
         this.introduction = user.getIntroduction();
-        this.roles = user.getRoles();
+        String rolesStr = user.getRoles();
+        this.roles = rolesStr == null ? new String[0] : rolesStr.split(",");
     }
 }

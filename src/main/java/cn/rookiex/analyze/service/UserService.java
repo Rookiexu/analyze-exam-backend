@@ -5,8 +5,6 @@ import cn.rookiex.analyze.entity.User;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author rookiex

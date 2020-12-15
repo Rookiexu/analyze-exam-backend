@@ -1,15 +1,12 @@
 package cn.rookiex.analyze.controller;
 
-import cn.rookiex.analyze.bean.ExamResults;
 import cn.rookiex.analyze.constants.MessageConstants;
 import cn.rookiex.analyze.entity.Exam;
 import cn.rookiex.analyze.entity.ExamResult;
 import cn.rookiex.analyze.entity.Student;
-import cn.rookiex.analyze.message.Message;
-import cn.rookiex.analyze.service.AnalyzeService;
+import cn.rookiex.analyze.message.ClassesData;
 import cn.rookiex.analyze.service.DataService;
 import cn.rookiex.analyze.service.ResultService;
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -85,5 +82,12 @@ public class DataController {
         }
 
         return resultService.getResult(exams);
+    }
+
+    @GetMapping(path = "/data/classes")
+    @ResponseBody
+    public String getClasses() {
+        ClassesData data = dataService.getAllClassInfo();
+        return resultService.getResult(data);
     }
 }

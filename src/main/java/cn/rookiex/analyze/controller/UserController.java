@@ -2,18 +2,17 @@ package cn.rookiex.analyze.controller;
 
 import cn.rookiex.analyze.constants.MessageErrCode;
 import cn.rookiex.analyze.entity.User;
-import cn.rookiex.analyze.message.Message;
 import cn.rookiex.analyze.message.UserData;
 import cn.rookiex.analyze.service.ResultService;
 import cn.rookiex.analyze.service.UserService;
-import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author rookiex
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Slf4j
 @Controller
+@RequestMapping(path = "/user")
 public class UserController {
 
     @Autowired
@@ -30,18 +30,26 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping(path = "/user/login")
+    @PostMapping(path = "/login")
     @ResponseBody
-    public String login(@RequestParam String userName, @RequestParam String password) {
-        String token = userService.login(userName,password);
+    public String login(@RequestBody Map<String,String> data) {
+        String username = data.get("username");
+        String password = data.get("password");
+
+        if (username == null || password == null){
+            return resultService.getErrResult(MessageErrCode.LOGIN_FAIL,"登录失败");
+        }
+        String token = userService.login(username, password);
         if (token == null){
-            return resultService.getErrResult(MessageErrCode.TOKEN_ERR,"登录失败");
+            return resultService.getErrResult(MessageErrCode.LOGIN_FAIL,"登录失败");
         }else {
-            return resultService.getResult(token);
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("token",token);
+            return resultService.getResult(map);
         }
     }
 
-    @GetMapping(path = "/user/getInfo")
+    @GetMapping(path = "/info")
     @ResponseBody
     public String getInfo(@RequestParam String token) {
         User user = userService.getInfo(token);
@@ -52,7 +60,7 @@ public class UserController {
         }
     }
 
-    @PostMapping(path = "/user/logout")
+    @PostMapping(path = "/logout")
     @ResponseBody
     public String logout(@RequestParam String token) {
         try {
