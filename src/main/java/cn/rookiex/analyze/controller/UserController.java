@@ -35,7 +35,7 @@ public class UserController {
     public String login(@RequestParam String userName, @RequestParam String password) {
         String token = userService.login(userName,password);
         if (token == null){
-            return resultService.getErrResult(MessageErrCode.TOKEN_ERR,"获取信息err");
+            return resultService.getErrResult(MessageErrCode.TOKEN_ERR,"登录失败");
         }else {
             return resultService.getResult(token);
         }
