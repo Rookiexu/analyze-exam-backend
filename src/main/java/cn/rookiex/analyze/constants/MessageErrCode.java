@@ -6,6 +6,7 @@ package cn.rookiex.analyze.constants;
  * @des
  */
 public enum MessageErrCode {
+    LOGIN_FAIL(50000),
     TOKEN_ERR(50008);
 
     private final int errCode;

@@ -5,12 +5,15 @@ import cn.rookiex.analyze.message.LineResultData;
 import cn.rookiex.analyze.message.Message;
 import cn.rookiex.analyze.service.AnalyzeService;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 /**
  * @author rookiex
@@ -26,8 +29,13 @@ public class AnalyzeController {
 
     @GetMapping(path = "/student/exams")
     @ResponseBody
-    public String getStudentAllExam(@RequestParam int rank, @RequestParam int classId, @RequestParam int grade) {
-        LineResultData analyzeExam = analyzeService.getClassAllExamResult(classId, grade, rank == 1);
+    public String getStudentAllExam(@RequestParam int rank, @RequestParam String classId, @RequestParam int grade) {
+        String[] split = classId.split(",");
+        List<Integer> classes = Lists.newArrayList();
+        for (String s : split) {
+            classes.add(Integer.parseInt(s));
+        }
+        LineResultData analyzeExam = analyzeService.getClassAllExamResult(classes, grade, rank == 1);
         Message message = new Message();
         message.setData(analyzeExam);
         String s = JSONObject.toJSONString(message);

@@ -6,4 +6,5 @@ package cn.rookiex.analyze.message;
  * @des
  */
 public interface MessageObj {
+
 }

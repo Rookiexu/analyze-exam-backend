@@ -21,8 +21,4 @@ public class LineResultData implements MessageObj {
      * 标题数据
      */
     private TitleInfo titleInfo;
-
-
-
-
 }

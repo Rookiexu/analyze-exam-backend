@@ -58,16 +58,22 @@ public class AnalyzeService {
         return resultService.respExamResultsFail("no student");
     }
 
-    public LineResultData getClassAllExamResult(int classId, int grade, boolean isRank) {
+    public LineResultData getClassAllExamResult(List<Integer> classIds, int grade, boolean isRank) {
         //全班学生
-        List<Student> classStudents = studentRepository.findAllByClassIdAndGrade(classId, grade);
+        List<Student> classStudents = Lists.newArrayList();
+        for (Integer classId : classIds) {
+            classStudents.addAll(studentRepository.findAllByClassIdAndGrade(classId, grade));
+        }
         //年级所有考试
         List<Exam> allGradeExam = examRepository.findAllByGrade(grade);
 
         Map<Integer,Exam> examMaps = getExamMaps(allGradeExam);
 
         //班级所有成绩
-        List<ExamResult> allByExamIdInAndClassId = examResultRepository.findAllByExamIdInAndClassId(examMaps.keySet(), classId);
+        List<ExamResult> allByExamIdInAndClassId = Lists.newArrayList();
+        for (Integer classId : classIds) {
+            allByExamIdInAndClassId.addAll(examResultRepository.findAllByExamIdInAndClassId(examMaps.keySet(), classId));
+        }
 
         return resultService.respGetClassAllExamResult(isRank, classStudents, examMaps, allByExamIdInAndClassId);
     }
