@@ -1,12 +1,8 @@
 package cn.rookiex.analyze.service;
 
-import cn.rookiex.analyze.dao.ExamRepository;
-import cn.rookiex.analyze.dao.ExamResultRepository;
-import cn.rookiex.analyze.dao.StudentRepository;
-import cn.rookiex.analyze.entity.Exam;
-import cn.rookiex.analyze.entity.ExamResult;
-import cn.rookiex.analyze.entity.ExamResultKey;
-import cn.rookiex.analyze.entity.Student;
+import cn.rookiex.analyze.dao.*;
+import cn.rookiex.analyze.entity.*;
+import cn.rookiex.analyze.message.ClassesData;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -28,6 +24,10 @@ public class DataService {
     private ExamRepository examRepository;
     @Autowired
     private StudentRepository studentRepository;
+    @Autowired
+    private ClazzRepository clazzRepository;
+    @Autowired
+    private GradeRepository gradeRepository;
 
     public List<Student> getAllStuByClassAndGrade(int classId, int grade) {
         return studentRepository.findAllByClassIdAndGrade(classId, grade);
@@ -139,5 +139,35 @@ public class DataService {
 
     public List<Student> getAllStu() {
         return studentRepository.findAll();
+    }
+
+    public ClassesData getAllClassInfo() {
+        List<Clazz> all = clazzRepository.findAll();
+        List<Grade> all1 = gradeRepository.findAll();
+
+        ClassesData classesData = new ClassesData();
+        List<Map<String,Object>> classes = Lists.newArrayList();
+        for (Clazz clazz : all) {
+            String name = clazz.getName();
+            int id = clazz.getId();
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("value", id);
+            map.put("label", name);
+            classes.add(map);
+        }
+        classesData.setClass_options(classes);
+
+        List<Map<String,Object>> grades = Lists.newArrayList();
+        for (Grade grade : all1) {
+            int id = grade.getId();
+            String name = grade.getName();
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("label", name);
+            map.put("value", id);
+            grades.add(map);
+        }
+        classesData.setGrade_options(grades);
+
+        return classesData;
     }
 }
