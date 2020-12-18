@@ -315,6 +315,16 @@ public class ResultService {
         return builder.build();
     }
 
+    public Map<Integer, ClassExamResult> getClassResultData(List<ExamResult> allByExamIdInAndClassId){
+        Map<Integer, ClassExamResult> classResultMap = Maps.newTreeMap();
+        Map<Integer, List<ExamResult>> idResultMap = getIdResultMap(allByExamIdInAndClassId);
+        for (Integer examId : idResultMap.keySet()) {
+            ClassExamResult classResult = buildClassResult(examId, idResultMap.get(examId));
+            classResultMap.put(examId, classResult);
+        }
+        return classResultMap;
+    }
+
     public ExamResults respGetClassAllExamHistory(Map<Integer, Exam> examMaps, List<ExamResult> allByExamIdInAndClassId, Set<String> prams) {
         Map<Integer, List<ExamResult>> idResultMap = getIdResultMap(allByExamIdInAndClassId);
         Map<Integer, ClassExamResult> classResultMap = Maps.newTreeMap();
@@ -331,6 +341,11 @@ public class ResultService {
         List<lineData> lineDates = buildLineDates(examMaps, classResultMap, prams);
         examResults.getDatasets().addAll(lineDates);
         return examResults;
+    }
+
+    public String getResult(){
+        Message message = new Message();
+        return JSONObject.toJSONString(message);
     }
 
     public String getResult(Object object){
