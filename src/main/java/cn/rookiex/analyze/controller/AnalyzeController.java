@@ -4,6 +4,7 @@ import cn.rookiex.analyze.bean.ExamResults;
 import cn.rookiex.analyze.message.LineResultData;
 import cn.rookiex.analyze.message.Message;
 import cn.rookiex.analyze.service.AnalyzeService;
+import cn.rookiex.analyze.service.ResultService;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public class AnalyzeController {
 
     @Autowired
     private AnalyzeService analyzeService;
+
+    @Autowired
+    private ResultService resultService;
 
     @GetMapping(path = "/student/exams")
     @ResponseBody
@@ -59,8 +63,8 @@ public class AnalyzeController {
     @GetMapping(path = "/class/exams")
     @ResponseBody
     public String getClassAllExamHistory(@RequestParam int classId, @RequestParam int grade) {
-            ExamResults analyzeExam = analyzeService.getClassAllExamHistory(classId, grade);
-            return JSONObject.toJSONString(analyzeExam);
+            LineResultData analyzeExam = analyzeService.getClassAllExamHistory(classId, grade);
+            return resultService.getResult(analyzeExam);
 //            ExamResults analyzeExam = analyzeService.getClassAllExamHistoryWithPrams(classId, grade, prams);
 //            return JSONObject.toJSONString(analyzeExam);
     }
